@@ -1,0 +1,174 @@
+---
+title: "EY92 Analysis"
+author: "Emily Yang"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(dplyr)
+library(readxl)
+library(ggplot2)
+
+df <- read_excel("~/Documents/Experiments/2.26.26 EY92 G206 mCherry.xlsx", 
+    sheet = "Sheet1")
+```
+
+```{r}
+
+newdf<- df %>%
+  group_by(ID) %>%
+  summarize(across(A1:G5, max)) 
+
+newdf1<- newdf %>%
+  slice(seq(from = 1, to = n(), by = 2))
+newdf2 <- newdf %>%
+  slice(seq(from = 2, to = n(), by = 2))
+
+min <-c(0,18.5,37,55.5,74,92.5,111,129.5,148,166.5,185,203.5,222,240.5,259,277.5,296,314.5,333,351.5,370,388.5,407,425.5,444,462.5,481,499.5,518,536.5,555,573.5,592,610.5,629,647.5,666,684.5,703,721.5,740,758.5,777,795.5,814,832.5,851,869.5,888,906.5,925,943.5,962,980.5,999,1017.5,1036) 
+
+i <- cbind(newdf1,min)
+j <- cbind(newdf2,min)
+```
+
+```{r Lum}
+
+p <- ggplot(i, aes(x=min)) + 
+  geom_line(aes(y = A1),color="red") + 
+  geom_line(aes(y = A3),color="steelblue") + 
+  geom_line(aes(y = A9), color="black") +
+  geom_line(aes(y = C1),color="steelblue") + 
+  geom_line(aes(y = C3),color="steelblue") + 
+  geom_line(aes(y = C9), color="black") +
+  geom_line(aes(y = E1),color="steelblue") + 
+  geom_line(aes(y = E3),color="red") +
+  geom_line(aes(y = G1),color="steelblue") + 
+  labs(title="EY92 Female Lum",
+        x ="Time (min)", y = "Luminescence (AU)", color = "Legend")+
+    scale_color_manual(values = colors)
+p
+#ggsave("EY92 FLum.png")
+
+   p <- ggplot(i, aes(x=min)) +  
+  geom_line(aes(y = A5),color="red") + 
+  geom_line(aes(y = A7), color="red") + 
+  geom_line(aes(y = A11), color="black") + 
+  geom_line(aes(y = C5),color="red") + 
+  geom_line(aes(y = C7), color="red") +
+  geom_line(aes(y = C11), color="black") + 
+  geom_line(aes(y = E5),color="red") + 
+  geom_line(aes(y = E11), color="black") + 
+  geom_line(aes(y = G5),color="red") +
+
+labs(title="EY92 Male Lum",
+        x ="Time (min)", y = "Luminescence (AU)", color = "Legend")+
+    scale_color_manual(values = colors)
+p
+#ggsave("EY92 MLum.png")
+```
+
+```{r Fluor}
+
+p <- ggplot(j, aes(x=min)) + 
+ geom_line(aes(y = A1),color="red") + 
+  geom_line(aes(y = A3),color="steelblue") + 
+  geom_line(aes(y = A9), color="black") +
+  geom_line(aes(y = C1),color="steelblue") + 
+  geom_line(aes(y = C3),color="steelblue") + 
+  geom_line(aes(y = C9), color="black") +
+  geom_line(aes(y = E1),color="steelblue") + 
+  geom_line(aes(y = E3),color="red") +
+  geom_line(aes(y = G1),color="steelblue") + 
+  labs(title="EY92 Female Fluor",
+        x ="Time (min)", y = "Fluorescence (AU)", color = "Legend")+
+    scale_color_manual(values = colors)
+p
+#ggsave("EY92 FFluor.png")
+
+   p <- ggplot(j, aes(x=min)) +  
+   geom_line(aes(y = A5),color="red") + 
+  geom_line(aes(y = A7), color="red") + 
+  geom_line(aes(y = A11), color="black") + 
+  geom_line(aes(y = C5),color="red") + 
+  geom_line(aes(y = C7), color="red") +
+  geom_line(aes(y = C11), color="black") + 
+  geom_line(aes(y = E5),color="red") + 
+  geom_line(aes(y = E11), color="black") + 
+  geom_line(aes(y = G5),color="red") +
+
+labs(title="EY92 Male Fluor",
+        x ="Time (min)", y = "Fluorescence (AU)", color = "Legend")+
+    scale_color_manual(values = colors)
+p
+#ggsave("EY92 MFluor.png")
+```
+
+
+```{r}
+colors <- c("mCherry" = "red","iLUX" = "cyan", "Fluor baseline"= "maroon", "Lum baseline"="blue")
+coeff <- 10
+x<-mean(i$A9)
+y<- i$A1-x
+z<-mean(j$A9)
+zz<- j$A1-z
+
+df2 <- data.frame(
+  stringsAsFactors = FALSE,
+            Lum = i$A1-mean(i$A9),
+            Fluor = j$A1-mean(j$A9),
+            Min = c(0,18.5,37,55.5,74,92.5,111,129.5,148,166.5,185,203.5,222,240.5,259,277.5,296,314.5,333,351.5,370,388.5,407,425.5,444,462.5,481,499.5,518,536.5,555,573.5,592,610.5,629,647.5,666,684.5,703,721.5,740,758.5,777,795.5,814,832.5,851,869.5,888,906.5,925,943.5,962,980.5,999,1017.5,1036)
+ )
+
+q<-ggplot() +
+  geom_line(data = df2, aes(x = min, y = Lum/coeff, color = "iLUX")) +
+  geom_line(data = df2, aes(x = min, y= Fluor, color = "mCherry"))+
+  geom_vline(xintercept = 814.0)+
+  scale_y_continuous(name = "Fluorescence (AU)",
+    sec.axis = sec_axis(~.*coeff, name="Luminescence (AU)"))+
+labs(title="",
+       x ="Time (min)", y = "Fluorescence (AU)", color = "Legend")+
+    scale_color_manual(values = colors)
+        
+q
+#ggsave("EY85 A7 Poster.png")
+
+```
+
+
+```{r Location, include=FALSE}
+ddf1<- df %>%
+pivot_longer(cols=setdiff(colnames(df), c("ID", "Position")), names_to = "Fly", values_to ="Brightness")
+
+newddf1 <- ddf1 %>%
+  group_by(ID, Fly) %>%
+  summarize(max_bright = max(Brightness)) %>%
+  ungroup()
+newddf1
+
+output <- tibble(Fly=NULL, ID = NULL, Position = NULL)
+for (k in c(1:nrow(ddf1))) {
+  lab <- ddf1$ID[k] 
+  fly <- ddf1$Fly[k]
+  pos <- ddf1$Position[k] 
+  brightness <- ddf1$Brightness[k]
+  max_value <- filter(newddf1, ID == lab & Fly == fly) %>%
+    select(max_bright) %>% pull()
+  if (max_value == brightness) {
+    output <- bind_rows(output, tibble(Fly=fly, ID = lab, Position = pos))
+  }
+}
+
+
+output1<- output %>%
+pivot_wider(id_cols = ID, names_from = Fly, values_from = Position)
+output1
+
+noutput1<- output1 %>%
+  slice(seq(from = 1, to = n(), by = 2))
+
+
+```
+
