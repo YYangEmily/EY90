@@ -12,6 +12,9 @@ library(tidyverse)
 library(dplyr)
 library(readxl)
 library(ggplot2)
+library(DescTools) # AUC calculation
+library(ggpubr) # P values
+
 
 df <- read_excel("~/Documents/Experiments/2.17.26 EY90 G192 mCherry.xlsx", 
     sheet = "Sheet1")
@@ -73,7 +76,7 @@ p
 #ggsave("EY90 FLum.png")
 ```
 
-```{r Lum}
+```{r Fluor}
 colors <- c("Female" = "red","Control Female" = "black")
 p <- ggplot(j, aes(x=min)) + 
   geom_line(aes(y = A1),color="steelblue") + 
@@ -110,4 +113,69 @@ labs(title="Dipt>mCherry",
     scale_color_manual(values = colors)
 p
 #ggsave("EY90 Poster.png")
+```
+
+
+```{r}
+
+my_vec <- numeric()
+
+for (col in i) {
+    a <- AUC(min, col, method = c("trapezoid"))
+    my_vec <- c(my_vec, a)
+}
+
+print(my_vec)
+
+df <- data.frame(dose=c("Male","Male","CM","Female","Female","CF","Male","Male","CM","Female","Female","CF","Male", "Male", "CM","Female","Female","Male","Male","CM","Female","Female"),
+    len=c(36694.75, 34373.00,  15706.50,  23661.50,  33827.25,  14883.25,  66516.75,
+121073.25,  14291.25,  25927.75,  52706.50,  14605.75, 101047.00,  54686.00,  14781.50,
+53335.50,  51578.00,  88827.75,  67691.50,  14457.75,  41532.50,  24392.25))
+
+my_comparisons <- list( c("Female", "CF"), c("Male", "CM"))
+p <- ggplot(df, aes(x=dose, y=len)) +
+geom_bar(stat="summary", 
+           fun=mean,
+           aes(fill=dose)) +
+  geom_point(position = position_jitter(width = 0.2), color = "black")+
+  stat_compare_means(comparisons = my_comparisons)+
+  #geom_signif(comparisons = my_comparisons, map_signif_level=TRUE)+
+  labs(title="EY90 Lum AUC",
+        x ="Condition", y = "Area Under Curve", color = "Legend")+
+    scale_color_manual(values = colors)
+p
+
+#ggsave("EY90 LAUC.png")
+
+```
+
+```{r}
+my_vec <- numeric()
+
+for (col in j) {
+    a <- AUC(min, col, method = c("trapezoid"))
+    my_vec <- c(my_vec, a)
+}
+
+print(my_vec)
+
+df <- data.frame(dose=c("Male","Male","CM","Female","Female","CF","Male","Male","CM","Female","Female","CF","Male", "Male", "CM","Female","Female","Male","Male","CM","Female","Female"),
+    len=c(15993.25,  10628.25,   7575.75,  12413.50,  16085.75,   8713.50,  13551.25,
+13292.25,   7973.50,  13218.25,  13310.75,   9250.00,  12348.75,  19850.50,  10258.25,
+11978.75,  13754.75,  14689.00,  16326.25,   9379.50,  13181.25,  15632.50))
+
+my_comparisons <- list( c("Female", "CF"), c("Male", "CM"))
+p <- ggplot(df, aes(x=dose, y=len)) +
+geom_bar(stat="summary", 
+           fun=mean,
+           aes(fill=dose)) +
+  geom_point(position = position_jitter(width = 0.2), color = "black")+
+  stat_compare_means(comparisons = my_comparisons)+
+  labs(title="EY90 Fluor AUC",
+        x ="Condition", y = "Area Under Curve", color = "Legend")+
+    scale_color_manual(values = colors)
+p
+
+
+#ggsave("EY90 FAUC.png")
 ```

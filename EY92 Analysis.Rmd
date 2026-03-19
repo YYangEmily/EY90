@@ -136,7 +136,69 @@ q
 #ggsave("EY85 A7 Poster.png")
 
 ```
+```{r}
 
+my_vec <- numeric()
+
+for (col in i) {
+    a <- AUC(min, col, method = c("trapezoid"))
+    my_vec <- c(my_vec, a)
+}
+
+print(my_vec)
+
+df <- data.frame(dose=c("Female","Female","Male","Male","CF","CM","Female","Female","Male","Male","CF","CM","Female","Female","Male","CM","Female","Male"),
+    len=c(35686.50,  19600.75,  58071.50,  40071.00,  15068.25,  14457.75,  19425.00,
+19961.50,  78208.75, 79596.25,  14254.25,  14208.00,  19693.25,  35103.75,  51411.50,
+14938.75,  23596.75,  49885.25 ))
+
+my_comparisons <- list( c("Female", "CF"), c("Male", "CM"))
+p <- ggplot(df, aes(x=dose, y=len)) +
+geom_bar(stat="summary", 
+           fun=mean,
+           aes(fill=dose)) +
+  geom_point(position = position_jitter(width = 0.2), color = "black")+
+  stat_compare_means(comparisons = my_comparisons)+
+  #geom_signif(comparisons = my_comparisons, map_signif_level=TRUE)+
+  labs(title="EY92 Lum AUC",
+        x ="Condition", y = "Area Under Curve", color = "Legend")+
+    scale_color_manual(values = colors)
+p
+
+#ggsave("EY92 LAUC.png")
+
+```
+
+```{r}
+my_vec <- numeric()
+
+for (col in j) {
+    a <- AUC(min, col, method = c("trapezoid"))
+    my_vec <- c(my_vec, a)
+}
+
+print(my_vec)
+
+df <- data.frame(dose=c("Female","Female","Male","Male","CF","CM","Female","Female","Male","Male","CF","CM","Female","Female","Male","CM","Female","Male"),
+    len=c(11053.75,  12191.50,   9657.00,   8426.75,   8195.50,  8685.75,  11590.25,
+11081.50,  15678.75,  10794.75, 11127.75,   8685.75,  11211.00,  13079.50,  30848.75,
+7307.50,  10212.00, 10073.25))
+
+my_comparisons <- list( c("Female", "CF"), c("Male", "CM"))
+p <- ggplot(df, aes(x=dose, y=len)) +
+geom_bar(stat="summary", 
+           fun=mean,
+           aes(fill=dose)) +
+  geom_point(position = position_jitter(width = 0.2), color = "black")+
+  stat_compare_means(comparisons = my_comparisons, exact = FALSE)+
+  labs(title="EY92 Fluor AUC",
+        x ="Condition", y = "Area Under Curve", color = "Legend")+
+    scale_color_manual(values = colors)
+p
+
+
+#ggsave("EY92 FAUC.png")
+```
 
 ```{r Location, include=FALSE}
 ddf1<- df %>%
